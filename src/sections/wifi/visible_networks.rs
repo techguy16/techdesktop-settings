@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use crate::{sections::SettingsGroup, ui::SettingsGui};
+use crate::{sections::SettingsGroup, ui::SettingsGui, widgets::SettingsEntry};
 use cosmic_dbus_networkmanager::{
 	device::SpecificDevice, interface::enums::ApSecurityFlags, nm::NetworkManager,
 };
@@ -247,10 +247,33 @@ impl SettingsGroup for VisibleNetworks {
 						if let Some(ap) = aps.get(device) {
 							eprintln!("configuring {:?}", ap);
 
+							view! {
+								info_box = gtk4::Box::new(gtk4::Orientation::Vertical, 8) {
+									append: ssid_section = &SettingsEntry {
+										set_title: "SSID",
+										set_child: ssid_label = &gtk4::Label::new(Some(ap.ssid.as_str())) {
+											add_css_class: "settings-entry-text"
+										}
+									},
+									append: bssid_section = &SettingsEntry {
+										set_title: "BSSID",
+										set_child: bssid_label = &gtk4::Label::new(Some(ap.hw_address.as_str())) {
+											add_css_class: "settings-entry-text"
+										}
+									},
+									append: strength_section = &SettingsEntry {
+										set_title: "Signal Strength",
+										set_child: strength_label = &gtk4::Label::new(Some(&format!("{}%", ap.strength))) {
+											add_css_class: "settings-entry-text"
+										}
+									},
+								}
+							}
+
 							let dialog = gtk4::MessageDialogBuilder::new()
 								.buttons(gtk4::ButtonsType::OkCancel)
-								.text(&format!("TODO {}", ap.ssid))
 								.build();
+							dialog.content_area().append(&info_box);
 
 							crate::task::spawn_local(async move {
 								dialog.run_future().await;
