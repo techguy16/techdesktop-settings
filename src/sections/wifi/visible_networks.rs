@@ -5,7 +5,9 @@ use cosmic_dbus_networkmanager::{
 	device::SpecificDevice, interface::enums::ApSecurityFlags, nm::NetworkManager,
 };
 use futures::StreamExt;
-use gtk4::{glib, prelude::*, Align, Button, Image, Label, Orientation, Spinner};
+use gtk4::{
+	glib, prelude::*, Align, Button, Dialog, HeaderBar, Image, Label, Orientation, Spinner,
+};
 use itertools::Itertools;
 use slotmap::{DefaultKey, SlotMap};
 use std::{
@@ -44,8 +46,6 @@ impl VisibleNetworks {
 		tx: &UnboundedSender<NetworksEvent>,
 		aps: &SlotMap<DefaultKey, AccessPoint>,
 	) {
-		dbg!(aps.len());
-
 		while let Some(widget) = target.first_child().as_ref() {
 			target.remove(widget);
 		}
@@ -124,7 +124,6 @@ impl VisibleNetworks {
 							continue;
 						}
 					}
-					eprintln!("scan changed");
 					match w.get_access_points().await {
 						Ok(aps) => {
 							if !aps.is_empty() {
@@ -258,32 +257,34 @@ impl SettingsGroup for VisibleNetworks {
 							eprintln!("configuring {:?}", ap);
 
 							view! {
-								info_box = gtk4::Box::new(gtk4::Orientation::Vertical, 8) {
-									append: ssid_section = &SettingsEntry {
-										set_title: "SSID",
-										set_child: ssid_label = &gtk4::Label::new(Some(ap.ssid.as_str())) {
-											add_css_class: "settings-entry-text"
-										}
+								dialog = Dialog {
+									set_titlebar: header = Some(&HeaderBar) {
+										add_css_class: "titlebar"
 									},
-									append: bssid_section = &SettingsEntry {
-										set_title: "BSSID",
-										set_child: bssid_label = &gtk4::Label::new(Some(ap.hw_address.as_str())) {
-											add_css_class: "settings-entry-text"
-										}
-									},
-									append: strength_section = &SettingsEntry {
-										set_title: "Signal Strength",
-										set_child: strength_label = &gtk4::Label::new(Some(&format!("{}%", ap.strength))) {
-											add_css_class: "settings-entry-text"
-										}
-									},
+									set_child: info_box = Some(&gtk4::Box) {
+										set_orientation: Orientation::Vertical,
+										set_spacing: 8,
+										append: ssid_section = &SettingsEntry {
+											set_title: "SSID",
+											set_child: ssid_label = &gtk4::Label::new(Some(ap.ssid.as_str())) {
+												add_css_class: "settings-entry-text"
+											}
+										},
+										append: bssid_section = &SettingsEntry {
+											set_title: "BSSID",
+											set_child: bssid_label = &gtk4::Label::new(Some(ap.hw_address.as_str())) {
+												add_css_class: "settings-entry-text"
+											}
+										},
+										append: strength_section = &SettingsEntry {
+											set_title: "Signal Strength",
+											set_child: strength_label = &gtk4::Label::new(Some(&format!("{}%", ap.strength))) {
+												add_css_class: "settings-entry-text"
+											}
+										},
+									}
 								}
 							}
-
-							let dialog = gtk4::MessageDialogBuilder::new()
-								.buttons(gtk4::ButtonsType::OkCancel)
-								.build();
-							dialog.content_area().append(&info_box);
 
 							crate::task::spawn_local(async move {
 								dialog.run_future().await;

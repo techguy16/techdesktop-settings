@@ -60,7 +60,9 @@ impl SettingsGui {
 	}
 
 	fn create_header() -> HeaderBar {
-		HeaderBar::builder().css_name("title").build()
+		HeaderBar::builder()
+			.css_classes(vec!["titlebar".into()])
+			.build()
 	}
 	fn create_base_box() -> gtk4::Box {
 		gtk4::Box::builder()
