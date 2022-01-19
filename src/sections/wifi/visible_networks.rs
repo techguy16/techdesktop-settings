@@ -6,11 +6,14 @@ use cosmic_dbus_networkmanager::{
 };
 use futures::StreamExt;
 use gtk4::{glib, prelude::*, Align, Button, Image, Label, Orientation, Spinner};
+use itertools::Itertools;
 use slotmap::{DefaultKey, SlotMap};
-use std::rc::Rc;
-use std::sync::{
-	atomic::{AtomicBool, Ordering},
-	Arc,
+use std::{
+	rc::Rc,
+	sync::{
+		atomic::{AtomicBool, Ordering},
+		Arc,
+	},
 };
 use tokio::sync::mpsc::UnboundedSender;
 use zbus::Connection;
@@ -187,8 +190,15 @@ impl AccessPoint {
 				out.push(ap);
 			}
 		}
-		out.sort_by(|a, b| a.strength.cmp(&b.strength));
-		out
+		let mut ret = out
+			.into_iter()
+			.sorted_by(|a, b| a.strength.cmp(&b.strength))
+			.rev()
+			.unique_by(|ap| ap.ssid.clone())
+			.collect::<Vec<Self>>();
+		// for some reason adding .rev() messes up unique_by, so we do this instead
+		ret.reverse();
+		ret
 	}
 }
 

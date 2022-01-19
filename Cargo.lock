@@ -301,6 +301,7 @@ dependencies = [
  "fuzzy-matcher",
  "grass",
  "gtk4",
+ "itertools",
  "once_cell",
  "os-release",
  "relm4-macros",
