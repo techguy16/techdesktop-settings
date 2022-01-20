@@ -35,13 +35,15 @@ impl SettingsGroup for AirplaneMode {
 	}
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
-		let checkbox = Switch::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Airplane Mode");
-			..set_description("Disables Wi-Fi, Bluetooth, and mobile broadband");
-			..set_child(&checkbox);
-		};
+		view! {
+			entry = SettingsEntry {
+				set_title: "Airplane Mode",
+				set_description: "Disables Wi-Fi, Bluetooth, and mobile broadband",
+				set_child: checkbox = &Switch {
+					set_valign: Align::Center
+				}
+			}
+		}
 		target.append(&entry);
 	}
 }
@@ -59,13 +61,15 @@ impl SettingsGroup for Wifi {
 	}
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
-		let checkbox = Switch::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Wi-Fi");
-			..set_description("Disables all Wi-Fi functions");
-			..set_child(&checkbox);
-		};
+		view! {
+			entry = SettingsEntry {
+				set_title: "Wi-Fi",
+				set_description: "Disables all Wi-Fi functions",
+				set_child: checkbox = &Switch {
+					set_valign: Align::Center
+				}
+			}
+		}
 		target.append(&entry);
 	}
 }
@@ -75,11 +79,15 @@ struct AdditionalNetworkSettings;
 
 impl AdditionalNetworkSettings {
 	pub fn create_hidden_network_popup() -> gtk4::Box {
-		let base = gtk4::Box::builder()
-			.orientation(Orientation::Vertical)
-			.build();
-		let label = Label::new(Some("Hello World!"));
-		base.append(&label);
+		view! {
+			base = gtk4::Box {
+				set_orientation: Orientation::Vertical,
+				append: label = &Label {
+					set_markup: "<b>Hidden Network</b>",
+					set_halign: Align::Center
+				},
+			}
+		}
 		base
 	}
 }
