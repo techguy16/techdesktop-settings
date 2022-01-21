@@ -211,7 +211,6 @@ impl SettingsGroup for VisibleNetworks {
 	}
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
-		dbg!(&target);
 		target.append(&self.spinner);
 
 		let (net_tx, mut net_rx) = tokio::sync::mpsc::unbounded_channel();

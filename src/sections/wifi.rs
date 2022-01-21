@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
+mod saved_networks;
 mod visible_networks;
 
 use super::{Section, SectionLayout, SettingsGroup};
@@ -18,6 +19,7 @@ impl Section for WifiSection {
 			Wifi::boxed(),
 			visible_networks::VisibleNetworks::boxed(),
 			AdditionalNetworkSettings::boxed(),
+			saved_networks::SavedNetworks::boxed(),
 		])
 	}
 }
