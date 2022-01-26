@@ -26,11 +26,11 @@ impl SavedNetworks {
 		};
 		let mut out = Vec::with_capacity(connections.len());
 		for connection in connections {
-			let settings = match connection.get_settings().await {
+			let settings = match connection.get_settings().await.map(Settings::new) {
 				Ok(settings) => settings,
 				Err(err) => todo!("error: {}", err), //TODO err msg
 			};
-			out.push(settings);
+			out.push(dbg!(settings));
 		}
 		if let Err(_why) = tx.send(out) {
 			eprintln!("{}:{}", file!(), line!());
@@ -73,7 +73,6 @@ impl SettingsGroup for SavedNetworks {
 			};
 			for setting in settings {
 				let connection_settings = setting.connection.unwrap();
-				dbg!(connection_settings.interface_name.clone());
 				view! {
 					outer_box = gtk4::Box {
 						set_orientation: Orientation::Horizontal,
@@ -88,7 +87,7 @@ impl SettingsGroup for SavedNetworks {
 								set_orientation: Orientation::Horizontal,
 								set_spacing: 16,
 								append: icon = &Image::from_icon_name(Some("network-wireless-symbolic")) {},
-								append: label = &Label::new(Some(&connection_settings.interface_name.unwrap())) {}
+								append: label = &Label::new(Some(&connection_settings.id.unwrap())) {}
 							}
 						},
 						append: settings_button = &Button {
