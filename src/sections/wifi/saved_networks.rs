@@ -14,26 +14,43 @@ impl SavedNetworks {
 	async fn get_connections(tx: UnboundedSender<Vec<Settings>>) {
 		let sys_conn = match Connection::system().await {
 			Ok(conn) => conn,
-			Err(_) => return, //TODO err msg
+			Err(err) => {
+				error!(%err, "Failed to connect to system dbus session");
+				return;
+			}
 		};
 		let settings = match NetworkManagerSettings::new(&sys_conn).await {
 			Ok(p) => p,
-			Err(_) => todo!(), //TODO err msg
+			Err(err) => {
+				error!(%err, "Failed to set up connection to NetworkManager settings");
+				return;
+			}
 		};
 		let connections = match settings.list_connections().await {
 			Ok(connections) => connections,
-			Err(_) => todo!(), //TODO err msg
+			Err(err) => {
+				error!(%err, "Failed to get list of connections from NetworkManager");
+				return;
+			}
 		};
 		let mut out = Vec::with_capacity(connections.len());
 		for connection in connections {
+			let filename = connection
+				.filename()
+				.await
+				.unwrap_or_else(|_| "unknown".to_string());
 			let settings = match connection.get_settings().await.map(Settings::new) {
 				Ok(settings) => settings,
-				Err(err) => todo!("error: {}", err), //TODO err msg
+				Err(err) => {
+					error!(%err, %filename, "Failed to get settings for connection");
+					continue;
+				}
 			};
-			out.push(dbg!(settings));
+			debug!(%filename, ?settings, "Got settings for connection");
+			out.push(settings);
 		}
-		if let Err(_why) = tx.send(out) {
-			eprintln!("{}:{}", file!(), line!());
+		if let Err(err) = tx.send(out) {
+			error!(%err, "Failed to send settings to main thread");
 		}
 	}
 }

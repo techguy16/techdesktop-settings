@@ -4,7 +4,7 @@ use crate::{sections::SettingsGroup, ui::SettingsGui, widgets::SettingsEntry};
 use cosmic_dbus_networkmanager::{
 	device::SpecificDevice, interface::enums::ApSecurityFlags, nm::NetworkManager,
 };
-use futures::StreamExt;
+use futures::{StreamExt, TryFutureExt};
 use gtk4::{
 	glib, prelude::*, Align, Button, Dialog, HeaderBar, Image, Label, Orientation, Spinner,
 };
@@ -91,36 +91,43 @@ impl VisibleNetworks {
 	async fn scan_for_devices(tx: UnboundedSender<NetworksEvent>) {
 		let sys_conn = match Connection::system().await {
 			Ok(conn) => conn,
-			Err(_) => return, //TODO err msg
+			Err(err) => {
+				error!(%err, "Failed to connect to system dbus session");
+				return;
+			}
 		};
-		// let sys_conn_cell = once_cell::sync::OnceCell::new();
-		// sys_conn_cell.set(sys_conn).unwrap();
-		// let sys_conn = sys_conn_cell.get().unwrap();
-
 		let nm = match NetworkManager::new(&sys_conn).await {
 			Ok(p) => p,
-			Err(_) => todo!(), //TODO err msg
+			Err(err) => {
+				error!(%err, "Failed to set up connection to NetworkManager dbus");
+				return;
+			}
 		};
 		let devices = match nm.devices().await {
 			Ok(d) => d,
-			Err(_) => todo!(),
+			Err(err) => {
+				error!(%err, "Failed to get devices from NetworkManager");
+				return;
+			}
 		};
 		let mut all_aps = SlotMap::new();
 
 		for d in devices {
 			if let Ok(Some(SpecificDevice::Wireless(w))) = d.downcast_to_device().await {
-				if w.request_scan(std::collections::HashMap::new())
+				let id = d
+					.active_connection()
+					.and_then(|ac| async move { ac.id().await })
 					.await
-					.is_err()
-				{
-					eprintln!("Scan failed");
+					.unwrap_or_else(|_| "unknown".to_string());
+				if let Err(err) = w.request_scan(std::collections::HashMap::new()).await {
+					error!(%err, %id, "Wi-Fi scan failed");
 					continue;
 				};
 				let mut scan_changed = w.receive_last_scan_changed().await;
 				if let Some(t) = scan_changed.next().await {
 					if let Ok(t) = t.get().await {
 						if t == -1 {
-							eprintln!("getting access points failed...");
+							error!(%id, "Getting access point failed");
 							continue;
 						}
 					}
@@ -134,8 +141,8 @@ impl VisibleNetworks {
 								break;
 							}
 						}
-						Err(_) => {
-							eprintln!("getting access points failed...");
+						Err(err) => {
+							error!(%err, %id, "Getting access points failed");
 							continue;
 						}
 					};
@@ -143,8 +150,8 @@ impl VisibleNetworks {
 			}
 		}
 
-		if let Err(why) = tx.send(NetworksEvent::ApList(all_aps)) {
-			eprintln!("{}:{}: {:?}", file!(), line!(), why);
+		if let Err(err) = tx.send(NetworksEvent::ApList(all_aps)) {
+			error!(%err, "failed to send AP list");
 		}
 	}
 }
@@ -227,7 +234,7 @@ impl SettingsGroup for VisibleNetworks {
 			async move {
 				loop {
 					if cancel.load(Ordering::Relaxed) {
-						eprintln!("stopped network scanning");
+						warn!("Stopped network scanning");
 						return;
 					}
 
@@ -253,7 +260,7 @@ impl SettingsGroup for VisibleNetworks {
 
 					NetworksEvent::ConfigureDevice(device) => {
 						if let Some(ap) = aps.get(device) {
-							eprintln!("configuring {:?}", ap);
+							debug!(?ap, "Configuring access point");
 
 							view! {
 								dialog = Dialog {
@@ -293,7 +300,7 @@ impl SettingsGroup for VisibleNetworks {
 					}
 
 					NetworksEvent::Quit => {
-						eprintln!("stop network scanning");
+						warn!("Stopping network scanning");
 						cancel.store(true, Ordering::SeqCst);
 						break;
 					}
