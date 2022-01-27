@@ -73,6 +73,17 @@ impl SettingsGroup for SavedNetworks {
 			};
 			for setting in settings {
 				let connection_settings = setting.connection.unwrap();
+				let icon_name = if setting.ethernet.is_some() {
+					"network-wired"
+				} else if setting.wifi.is_some() {
+					"network-wireless"
+				} else if setting.bluetooth.is_some() {
+					"bluetooth-active"
+				} else if setting.proxy.is_some() {
+					"network-vpn"
+				} else {
+					"dialog-question"
+				};
 				view! {
 					outer_box = gtk4::Box {
 						set_orientation: Orientation::Horizontal,
@@ -86,7 +97,7 @@ impl SettingsGroup for SavedNetworks {
 							set_child: inner_box = Some(&gtk4::Box) {
 								set_orientation: Orientation::Horizontal,
 								set_spacing: 16,
-								append: icon = &Image::from_icon_name(Some("network-wireless-symbolic")) {},
+								append: icon = &Image::from_icon_name(Some(icon_name)) {},
 								append: label = &Label::new(Some(&connection_settings.id.unwrap())) {}
 							}
 						},
