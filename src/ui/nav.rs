@@ -92,7 +92,7 @@ impl SettingsNavGui {
 		button_box.append(&button_label);
 		let button_sep = gtk4::Separator::new(Orientation::Vertical);
 		button_box.append(&button_sep);
-		let button_icon = gtk4::Image::from_icon_name(Some("go-next-symbolic"));
+		let button_icon = gtk4::Image::from_icon_name("go-next-symbolic");
 		button_box.append(&button_icon);
 		let button = gtk4::Button::builder()
 			.child(&button_box)

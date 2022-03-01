@@ -14,7 +14,7 @@ use std::rc::Rc;
 
 pub fn setup<S: Section>(ui: Rc<SettingsGui>, sections_store: SettingsGroupStore) {
 	// Set up the nav entry
-	let icon = Image::from_icon_name(Some(S::ICON));
+	let icon = Image::from_icon_name(S::ICON);
 	let label = Label::new(Some(S::NAME));
 	let entry_box = gtk4::Box::builder()
 		.orientation(Orientation::Horizontal)

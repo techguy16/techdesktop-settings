@@ -19,18 +19,15 @@ impl ListBoxSelectionRow {
 	}
 
 	pub fn row_id(&self) -> String {
-		let value = self.property("row-id").expect("invalid row_id");
-		value.get::<String>().expect("row_id is not string?")
+		self.property::<String>("row-id")
 	}
 
 	pub fn subsection(&self) -> bool {
-		let value = self.property("subsection").expect("invalid subsection");
-		value.get::<bool>().expect("subsection is not bool?")
+		self.property::<bool>("subsection")
 	}
 
 	pub fn set_subsection(&self, subsection: bool) {
-		self.set_property("subsection", subsection)
-			.expect("failed to set subsection");
+		self.set_property("subsection", subsection);
 	}
 }
 
@@ -60,14 +57,14 @@ impl ObjectImpl for ListBoxSelectionRowImp {
 		use once_cell::sync::Lazy;
 		static PROPERTIES: Lazy<Vec<glib::ParamSpec>> = Lazy::new(|| {
 			vec![
-				glib::ParamSpec::new_string(
+				glib::ParamSpecString::new(
 					"row-id",
 					"row id",
 					"row id",
 					None,
 					glib::ParamFlags::READWRITE,
 				),
-				glib::ParamSpec::new_boolean(
+				glib::ParamSpecBoolean::new(
 					"subsection",
 					"subsection",
 					"subsection",

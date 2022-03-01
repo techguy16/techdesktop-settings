@@ -4,9 +4,11 @@ mod saved_networks;
 mod visible_networks;
 
 use super::{Section, SectionLayout, SettingsGroup};
-use crate::{ui::SettingsGui, widgets::SettingsEntry};
+use crate::ui::SettingsGui;
 use gtk4::{glib, prelude::*, Align, Button, Label, Orientation, Switch};
+use libcosmic_widgets::{relm4::RelmContainerExt, LabeledItem};
 use std::rc::Rc;
+
 pub struct WifiSection;
 
 impl Section for WifiSection {

@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use crate::{sections::SettingsGroup, ui::SettingsGui, widgets::SettingsEntry};
+use crate::{sections::SettingsGroup, ui::SettingsGui};
 use gtk4::{prelude::*, Align, CheckButton, SpinButton};
+use libcosmic_widgets::{relm4::RelmContainerExt, LabeledItem};
 use std::rc::Rc;
 
 #[derive(Default)]

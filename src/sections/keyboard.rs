@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use super::{Section, SectionLayout, SettingsGroup};
-use crate::{ui::SettingsGui, widgets::SettingsEntry};
+use crate::ui::SettingsGui;
 use gtk4::{prelude::*, Align, CheckButton, Label};
+use libcosmic_widgets::{relm4::RelmContainerExt, LabeledItem};
 use std::rc::Rc;
 
 pub struct KeyboardSection;

@@ -4,8 +4,9 @@ mod dock;
 mod workspaces;
 
 use super::{Section, SectionLayout, SettingsGroup};
-use crate::{ui::SettingsGui, widgets::SettingsEntry};
+use crate::ui::SettingsGui;
 use gtk4::{prelude::*, Align, CheckButton, Switch};
+use libcosmic_widgets::{relm4::RelmContainerExt, LabeledItem};
 use std::rc::Rc;
 
 pub struct DesktopSection;

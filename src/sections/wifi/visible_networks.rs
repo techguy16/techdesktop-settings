@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use crate::{sections::SettingsGroup, ui::SettingsGui, widgets::SettingsEntry};
+use crate::{sections::SettingsGroup, ui::SettingsGui};
 use cosmic_dbus_networkmanager::{
 	device::SpecificDevice, interface::enums::ApSecurityFlags, nm::NetworkManager,
 };
@@ -9,6 +9,7 @@ use gtk4::{
 	glib, prelude::*, Align, Button, Dialog, HeaderBar, Image, Label, Orientation, Spinner,
 };
 use itertools::Itertools;
+use libcosmic_widgets::{relm4::RelmContainerExt, LabeledItem};
 use slotmap::{DefaultKey, SlotMap};
 use std::{
 	rc::Rc,
@@ -65,7 +66,7 @@ impl VisibleNetworks {
 						set_child: inner_box = Some(&gtk4::Box) {
 							set_orientation: Orientation::Horizontal,
 							set_spacing: 16,
-							append: icon = &Image::from_icon_name(Some("network-wireless-symbolic")) {},
+							append: icon = &Image::from_icon_name("network-wireless-symbolic") {},
 							append: label = &Label::new(Some(&ap.ssid)) {}
 						}
 					},
@@ -270,19 +271,19 @@ impl SettingsGroup for VisibleNetworks {
 									set_child: info_box = Some(&gtk4::Box) {
 										set_orientation: Orientation::Vertical,
 										set_spacing: 8,
-										append: ssid_section = &SettingsEntry {
+										container_add: ssid_section = &LabeledItem {
 											set_title: "SSID",
 											set_child: ssid_label = &gtk4::Label::new(Some(ap.ssid.as_str())) {
 												add_css_class: "settings-entry-text"
 											}
 										},
-										append: bssid_section = &SettingsEntry {
+										container_add: bssid_section = &LabeledItem {
 											set_title: "BSSID",
 											set_child: bssid_label = &gtk4::Label::new(Some(ap.hw_address.as_str())) {
 												add_css_class: "settings-entry-text"
 											}
 										},
-										append: strength_section = &SettingsEntry {
+										container_add: strength_section = &LabeledItem {
 											set_title: "Signal Strength",
 											set_child: strength_label = &gtk4::Label::new(Some(&format!("{}%", ap.strength))) {
 												add_css_class: "settings-entry-text"

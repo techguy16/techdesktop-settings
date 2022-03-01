@@ -114,7 +114,7 @@ impl SettingsGroup for SavedNetworks {
 							set_child: inner_box = Some(&gtk4::Box) {
 								set_orientation: Orientation::Horizontal,
 								set_spacing: 16,
-								append: icon = &Image::from_icon_name(Some(icon_name)) {},
+								append: icon = &Image::from_icon_name(icon_name) {},
 								append: label = &Label::new(Some(&connection_settings.id.unwrap())) {}
 							}
 						},

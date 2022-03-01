@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use super::{Section, SectionLayout, SettingsGroup};
-use crate::{ui::SettingsGui, widgets::SettingsEntry};
+use crate::ui::SettingsGui;
 use bytesize::ByteSize;
 use gtk4::{prelude::*, Image, Label, Orientation};
+use libcosmic_widgets::{relm4::RelmContainerExt, LabeledItem};
 use os_release::OsRelease;
 use std::rc::Rc;
 use sysinfo::{DiskExt, ProcessorExt, System, SystemExt};
