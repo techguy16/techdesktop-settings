@@ -18,34 +18,32 @@ impl SettingsGroup for Workspaces {
 	}
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
-		let check = CheckButton::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Dynamic Workspaces");
-			..set_description("Automatically removes empty workspaces");
-			..set_child(&check);
-			..align_child(Align::Start);
-		};
-		target.append(&entry);
-		let check = CheckButton::builder()
-			.valign(Align::Center)
-			.group(&check)
-			.build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Fixed Number of Workspaces");
-			..set_description("Specify a number of Workspaces");
-			..set_child(&check);
-			..align_child(Align::Start);
-		};
-		target.append(&entry);
-		let spin = SpinButton::with_range(1., 10., 1.);
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Number of Workspaces");
-			..set_child(&spin);
-		};
-		target.append(&entry);
+		view! {
+			entry_box = gtk4::Box {
+				container_add: dynamic_workspaces = &LabeledItem {
+					set_title: "Dynamic Workspaces",
+					set_description: "Automatically removes empty workspaces",
+					set_alignment: Align::Start,
+					set_child: dynamic_check = &CheckButton {
+						set_valign: Align::Center,
+					}
+				},
+				container_add: fixed_workspaces = &LabeledItem {
+					set_title: "Fixed Number of Workspaces",
+					set_description: "Specify a number of Workspaces",
+					set_alignment: Align::Start,
+					set_child: fixed_check = &CheckButton {
+						set_valign: Align::Center,
+						set_group: Some(&dynamic_check)
+					}
+				},
+				container_add: number_of_workspaces = &LabeledItem {
+					set_title: "Number of Workspaces",
+					set_child: fixed_spin = &SpinButton::with_range(1., 10., 1.) {}
+				}
+			}
+		}
+		target.append(&entry_box);
 	}
 }
 
@@ -62,25 +60,26 @@ impl SettingsGroup for MultiMonitorBehavior {
 	}
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
-		let check = CheckButton::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Workspaces Span Displays");
-			..set_child(&check);
-			..align_child(Align::Start);
-		};
-		target.append(&entry);
-		let check = CheckButton::builder()
-			.valign(Align::Center)
-			.group(&check)
-			.build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Workspaces on Primary Display Only");
-			..set_child(&check);
-			..align_child(Align::Start);
-		};
-		target.append(&entry);
+		view! {
+			entry_box = gtk4::Box {
+				container_add: workspaces_span = &LabeledItem {
+					set_title: "Workspaces Span Displays",
+					set_alignment: Align::Start,
+					set_child: span_check = &CheckButton {
+						set_valign: Align::Center,
+					}
+				},
+				container_add: workspaces_primary = &LabeledItem {
+					set_title: "Workspaces on Primary Display Only",
+					set_alignment: Align::Start,
+					set_child: primary_check = &CheckButton {
+						set_valign: Align::Center,
+						set_group: Some(&span_check)
+					}
+				},
+			}
+		}
+		target.append(&entry_box);
 	}
 }
 
@@ -97,24 +96,25 @@ impl SettingsGroup for PlacementWorkspacePicker {
 	}
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
-		let check = CheckButton::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Along the left side");
-			..set_child(&check);
-			..align_child(Align::Start);
-		};
-		target.append(&entry);
-		let check = CheckButton::builder()
-			.valign(Align::Center)
-			.group(&check)
-			.build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Along the right side");
-			..set_child(&check);
-			..align_child(Align::Start);
-		};
-		target.append(&entry);
+		view! {
+			entry_box = gtk4::Box {
+				container_add: left_side = &LabeledItem {
+					set_title: "Along the left side",
+					set_alignment: Align::Start,
+					set_child: left_side_check = &CheckButton {
+						set_valign: Align::Center,
+					}
+				},
+				container_add: right_side_primary = &LabeledItem {
+					set_title: "Along the right side",
+					set_alignment: Align::Start,
+					set_child: right_side_check = &CheckButton {
+						set_valign: Align::Center,
+						set_group: Some(&left_side_check)
+					}
+				},
+			}
+		}
+		target.append(&entry_box);
 	}
 }
