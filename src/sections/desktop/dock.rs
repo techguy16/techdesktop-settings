@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use crate::{sections::SettingsGroup, ui::SettingsGui, widgets::SettingsEntry};
-use gtk4::{prelude::*, Align, CheckButton, Switch};
+use crate::{sections::SettingsGroup, ui::SettingsGui};
+use gtk4::{prelude::*, Align, CheckButton, Orientation, Switch};
+use libcosmic_widgets::{relm4::RelmContainerExt, LabeledItem};
 use std::rc::Rc;
 
 #[derive(Default)]
@@ -17,13 +18,17 @@ impl SettingsGroup for Dock {
 	}
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
-		let switch = Switch::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Enable Dock");
-			..set_child(&switch);
-		};
-		target.append(&entry);
+		view! {
+			entry_box = gtk4::Box {
+				container_add: entry = &LabeledItem {
+					set_title: "Enable Dock",
+					set_child: switch = &Switch {
+						set_valign: Align::Center
+					}
+				}
+			}
+		}
+		target.append(&entry_box);
 	}
 }
 
@@ -50,41 +55,42 @@ impl SettingsGroup for DockOptions {
 	}
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
-		let switch = Switch::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Extend dock to the edge of the screen");
-			..set_child(&switch);
-		};
-		target.append(&entry);
-		let switch = Switch::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Show Launcher Icon in Dock");
-			..set_child(&switch);
-		};
-		target.append(&entry);
-		let switch = Switch::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Show Workspaces Icon in Dock");
-			..set_child(&switch);
-		};
-		target.append(&entry);
-		let switch = Switch::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Show Applications Icon in Dock");
-			..set_child(&switch);
-		};
-		target.append(&entry);
-		let switch = Switch::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Show Mounted Drives");
-			..set_child(&switch);
-		};
-		target.append(&entry);
+		view! {
+			entry_box = gtk4::Box {
+				set_orientation: Orientation::Vertical,
+				container_add: extend_entry = &LabeledItem {
+					set_title: "Extend dock to the edge of the screen",
+					set_child: extend_switch = &Switch {
+						set_valign: Align::Center
+					}
+				},
+				container_add: launcher_entry = &LabeledItem {
+					set_title: "Show Launcher Icon in Dock",
+					set_child: launcher_switch = &Switch {
+						set_valign: Align::Center
+					}
+				},
+				container_add: workspaces_entry = &LabeledItem {
+					set_title: "Show Workspaces Icon in Dock",
+					set_child: workspaces_switch = &Switch {
+						set_valign: Align::Center
+					}
+				},
+				container_add: apps_entry = &LabeledItem {
+					set_title: "Show Applications Icon in Dock",
+					set_child: apps_switch = &Switch {
+						set_valign: Align::Center
+					}
+				},
+				container_add: drives_entry = &LabeledItem {
+					set_title: "Show Mounted Drives",
+					set_child: drives_switch = &Switch {
+						set_valign: Align::Center
+					}
+				}
+			}
+		}
+		target.append(&entry_box);
 	}
 }
 
@@ -101,38 +107,37 @@ impl SettingsGroup for DockVisibility {
 	}
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
-		let check = CheckButton::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Always Visible");
-			..set_child(&check);
-			..align_child(Align::Start);
-		};
-		target.append(&entry);
-		let check = CheckButton::builder()
-			.valign(Align::Center)
-			.group(&check)
-			.build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Always hide");
-			..set_description("Dock always hides unless actively being revealed by the mouse");
-			..set_child(&check);
-			..align_child(Align::Start);
-		};
-		target.append(&entry);
-		let check = CheckButton::builder()
-			.valign(Align::Center)
-			.group(&check)
-			.build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Intelligently hide");
-			..set_description("Dock hides when any window overlaps the dock area");
-			..set_child(&check);
-			..align_child(Align::Start);
-		};
-		target.append(&entry);
+		view! {
+			entry_box = gtk4::Box {
+				set_orientation: Orientation::Vertical,
+				container_add: always_vis_entry = &LabeledItem {
+					set_title: "Always Visible",
+					set_alignment: Align::Start,
+					set_child: always_vis_check = &CheckButton {
+						set_valign: Align::Center
+					}
+				},
+				container_add: medium_entry = &LabeledItem {
+					set_title: "Always Hide",
+					set_description: Some("Dock always hides unless actively being revealed by the mouse"),
+					set_alignment: Align::Start,
+					set_child: medium_check = &CheckButton {
+						set_valign: Align::Center,
+						set_group: Some(&always_vis_check)
+					}
+				},
+				container_add: large_entry = &LabeledItem {
+					set_title: "Intelligently Hide",
+					set_description: Some("Dock hides when any window overlaps the dock area"),
+					set_alignment: Align::Start,
+					set_child: large_check = &CheckButton {
+						set_valign: Align::Center,
+						set_group: Some(&always_vis_check)
+					}
+				},
+			}
+		}
+		target.append(&entry_box);
 	}
 }
 
@@ -150,34 +155,34 @@ impl SettingsGroup for DockSize {
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
 		let check = CheckButton::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Small (36px)");
-			..set_child(&check);
-			..align_child(Align::Start);
-		};
-		target.append(&entry);
-		let check = CheckButton::builder()
-			.valign(Align::Center)
-			.group(&check)
-			.build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Medium (48px)");
-			..set_child(&check);
-			..align_child(Align::Start);
-		};
-		target.append(&entry);
-		let check = CheckButton::builder()
-			.valign(Align::Center)
-			.group(&check)
-			.build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Large (60px)");
-			..set_child(&check);
-			..align_child(Align::Start);
-		};
-		target.append(&entry);
+		view! {
+			entry_box = gtk4::Box {
+				set_orientation: Orientation::Vertical,
+				container_add: small_entry = &LabeledItem {
+					set_title: "Small (36px)",
+					set_alignment: Align::Start,
+					set_child: small_check = &CheckButton {
+						set_valign: Align::Center
+					}
+				},
+				container_add: medium_entry = &LabeledItem {
+					set_title: "Medium (48px)",
+					set_alignment: Align::Start,
+					set_child: medium_check = &CheckButton {
+						set_valign: Align::Center,
+						set_group: Some(&small_check)
+					}
+				},
+				container_add: large_entry = &LabeledItem {
+					set_title: "Large (60px)",
+					set_alignment: Align::Start,
+					set_child: large_check = &CheckButton {
+						set_valign: Align::Center,
+						set_group: Some(&small_check)
+					}
+				},
+			}
+		}
+		target.append(&entry_box);
 	}
 }
