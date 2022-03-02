@@ -40,7 +40,7 @@ impl SettingsGroup for AirplaneMode {
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
 		view! {
-			entry = SettingsEntry {
+			entry = LabeledItem {
 				set_title: "Airplane Mode",
 				set_description: "Disables Wi-Fi, Bluetooth, and mobile broadband",
 				set_child: checkbox = &Switch {
@@ -48,7 +48,7 @@ impl SettingsGroup for AirplaneMode {
 				}
 			}
 		}
-		target.append(&entry);
+		target.container_add(&entry);
 	}
 }
 
@@ -66,7 +66,7 @@ impl SettingsGroup for Wifi {
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
 		view! {
-			entry = SettingsEntry {
+			entry = LabeledItem {
 				set_title: "Wi-Fi",
 				set_description: "Disables all Wi-Fi functions",
 				set_child: checkbox = &Switch {
@@ -74,7 +74,7 @@ impl SettingsGroup for Wifi {
 				}
 			}
 		}
-		target.append(&entry);
+		target.container_add(&entry);
 	}
 }
 

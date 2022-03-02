@@ -2,7 +2,7 @@
 
 use super::{Section, SectionLayout, SettingsGroup};
 use crate::ui::SettingsGui;
-use gtk4::{prelude::*, Align, CheckButton, Label};
+use gtk4::{prelude::*, Align, CheckButton, Label, Orientation};
 use libcosmic_widgets::{relm4::RelmContainerExt, LabeledItem};
 use std::rc::Rc;
 
@@ -39,33 +39,35 @@ impl SettingsGroup for InputSourceSwitching {
 	}
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
-		let check = CheckButton::builder().valign(Align::Center).build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Use the same source for all windows");
-			..set_child(&check);
-			..align_child(gtk4::Align::Start);
-		};
-		target.append(&entry);
-		let check = CheckButton::builder()
-			.valign(Align::Center)
-			.group(&check)
-			.build();
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Switch input sources individually for each window");
-			..set_child(&check);
-			..align_child(Align::Start);
-		};
-		target.append(&entry);
-		let label = Label::new(Some("Super+Space"));
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Keyboard Shortcut");
-			..set_description("This can be changed in Shortcuts");
-			..set_child(&label);
-		};
-		target.append(&entry);
+		view! {
+			entry_box = gtk4::Box {
+				set_orientation: Orientation::Vertical,
+				container_add: same_source = &LabeledItem {
+					set_title: "Use the same source for all windows",
+					set_alignment: Align::Start,
+					set_child: same_check = &CheckButton {
+						set_valign: Align::Center
+					}
+				},
+				container_add: switch_source = &LabeledItem {
+					set_title: "Switch input sources individually for each window",
+					set_alignment: Align::Start,
+					set_child: switch_check = &CheckButton {
+						set_valign: Align::Center,
+						set_group: Some(&same_check)
+					}
+				},
+				container_add: kb_shortcut = &LabeledItem {
+					set_title: "Keyboard Shortcut",
+					set_description: "This can be changed in Shortcuts",
+					set_alignment: Align::Start,
+					set_child: kb_label = &Label {
+						set_text: "Super+Space"
+					}
+				}
+			}
+		}
+		target.append(&entry_box);
 	}
 }
 
@@ -90,20 +92,24 @@ impl SettingsGroup for TypeSpecialCharacters {
 	}
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
-		let label = Label::new(Some("Layout Default"));
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Alternate Characters Key");
-			..set_description("Hold down and type to enter different characters");
-			..set_child(&label);
-		};
-		target.append(&entry);
-		let label = Label::new(Some("Layout Default"));
-		let entry = cascade! {
-			SettingsEntry::new();
-			..set_title("Compose Key");
-			..set_child(&label);
-		};
-		target.append(&entry);
+		view! {
+			entry_box = gtk4::Box {
+				set_orientation: Orientation::Vertical,
+				container_add: alt_characters = &LabeledItem {
+					set_title: "Alternate Characters Key",
+					set_description: "Hold down and type to enter different characters",
+					set_child: alt_label = &Label {
+						set_text: "Layout Default"
+					}
+				},
+				container_add: compose_characters = &LabeledItem {
+					set_title: "Compose Key",
+					set_child: compose_label = &Label {
+						set_text: "Layout Default"
+					}
+				}
+			}
+		}
+		target.append(&entry_box);
 	}
 }
