@@ -119,7 +119,7 @@ impl SettingsGroup for DockVisibility {
 				},
 				container_add: medium_entry = &LabeledItem {
 					set_title: "Always Hide",
-					set_description: Some("Dock always hides unless actively being revealed by the mouse"),
+					set_description: "Dock always hides unless actively being revealed by the mouse",
 					set_alignment: Align::Start,
 					set_child: medium_check = &CheckButton {
 						set_valign: Align::Center,

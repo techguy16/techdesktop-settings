@@ -58,12 +58,15 @@ impl SettingsGroup for Device {
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
 		SYSTEM_INFO.with(|info| {
 			if let Some(hostname) = info.host_name() {
-				let row = cascade! {
-					SettingsEntry::new();
-					..set_title("Device Name");
-					..set_child_label(hostname);
-				};
-				target.append(&row);
+				view! {
+					row = LabeledItem {
+						set_title: "Device Name",
+						set_child: label = &Label {
+							set_text: &hostname
+						}
+					}
+				}
+				target.container_add(&row);
 			}
 		});
 	}
@@ -114,19 +117,25 @@ impl SettingsGroup for DeviceSpecs {
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
 		SYSTEM_INFO.with(|info| {
 			let memory = ByteSize::kb(info.total_memory());
-			let row = cascade! {
-				SettingsEntry::new();
-				..set_title("Memory");
-				..set_child_label(memory.to_string_as(true));
-			};
-			target.append(&row);
+			view! {
+				memory_row = LabeledItem {
+					set_title: "Memory",
+					set_child: memory_label = &Label {
+						set_text: &memory.to_string_as(true)
+					}
+				}
+			}
+			target.container_add(&memory_row);
 			let cpu = info.global_processor_info();
-			let row = cascade! {
-				SettingsEntry::new();
-				..set_title("Processor");
-				..set_child_label(cpu.brand());
-			};
-			target.append(&row);
+			view! {
+				memory_row = LabeledItem {
+					set_title: "Processor",
+					set_child: memory_label = &Label {
+						set_text: cpu.name()
+					}
+				}
+			}
+			target.container_add(&memory_row);
 			let gpus = Self::gpus();
 			let graphics_box = gtk4::Box::new(Orientation::Vertical, 8);
 			if !gpus.is_empty() {
@@ -137,20 +146,24 @@ impl SettingsGroup for DeviceSpecs {
 						.build();
 					graphics_box.append(&label);
 				}
-				let graphics = cascade! {
-					SettingsEntry::new();
-					..set_title("Graphics");
-					..set_child(&graphics_box);
-				};
-				target.append(&graphics);
+				view! {
+					gpus_row = LabeledItem {
+						set_title: "Memory",
+						set_child: &graphics_box
+					}
+				}
+				target.container_add(&gpus_row);
 			}
 			let disk = &info.disks()[0];
-			let row = cascade! {
-				SettingsEntry::new();
-				..set_title("Disk Capacity");
-				..set_child_label(ByteSize::b(disk.total_space()).to_string_as(true));
-			};
-			target.append(&row);
+			view! {
+				disk_row = LabeledItem {
+					set_title: "Disk Capacity",
+					set_child: disk_label = &Label {
+						set_text: &ByteSize::b(disk.total_space()).to_string_as(true)
+					}
+				}
+			}
+			target.container_add(&disk_row);
 		});
 	}
 }
@@ -181,12 +194,15 @@ impl SettingsGroup for OsInfo {
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
 		SYSTEM_INFO.with(|info| {
 			if let (Some(os_version), Some(os_name)) = (info.os_version(), info.name()) {
-				let row = cascade! {
-					SettingsEntry::new();
-					..set_title("OS Name");
-					..set_child_label(format!("{} {}", os_name, os_version));
-				};
-				target.append(&row);
+				view! {
+					os_row = LabeledItem {
+						set_title: "Operating System",
+						set_child: os_label = &Label {
+							set_text: &format!("{} {}", os_name, os_version)
+						}
+					}
+				}
+				target.container_add(&os_row);
 			}
 
 			let os_type = if cfg!(target_arch = "aarch64") {
@@ -198,24 +214,30 @@ impl SettingsGroup for OsInfo {
 			} else {
 				"Unknown"
 			};
-			let row = cascade! {
-				SettingsEntry::new();
-				..set_title("OS Type");
-				..set_child_label(os_type);
-			};
-			target.append(&row);
+			view! {
+				arch_row = LabeledItem {
+					set_title: "OS Type",
+					set_child: arch_label = &Label {
+						set_text: &os_type
+					}
+				}
+			}
+			target.container_add(&arch_row);
 
 			let window_system = match std::env::var("XDG_SESSION_TYPE").as_deref() {
 				Ok("wayland") => "Wayland",
 				Ok("x11") => "X11",
 				_ => "Unknown",
 			};
-			let row = cascade! {
-				SettingsEntry::new();
-				..set_title("Windowing System");
-				..set_child_label(window_system);
-			};
-			target.append(&row);
+			view! {
+				window_system_row = LabeledItem {
+					set_title: "Windowing System",
+					set_child: window_label = &Label {
+						set_text: window_system
+					}
+				}
+			}
+			target.container_add(&window_system_row);
 		});
 	}
 }

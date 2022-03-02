@@ -1036,7 +1036,7 @@ checksum = "1bf2e165bb3457c8e098ea76f3e3bc9db55f87aa90d52d0e6be741470916aaa4"
 [[package]]
 name = "libcosmic-widgets"
 version = "0.1.0"
-source = "git+https://github.com/pop-os/libcosmic?branch=lucy/widgets#f7f87104f6af2e17a75c966f88d818f8de0ef833"
+source = "git+https://github.com/pop-os/libcosmic?branch=lucy/widgets#0e9375f05899c791842b767f373ac3bbe2071168"
 dependencies = [
  "gtk4",
  "relm4",
