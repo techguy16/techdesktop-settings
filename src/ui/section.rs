@@ -101,41 +101,43 @@ fn setup_multi(
 	sections: Vec<(&'static str, Vec<Box<dyn SettingsGroup>>)>,
 	sections_store: SettingsGroupStore,
 ) {
-	let nav = ListBox::builder()
-		.margin_top(20)
-		.margin_bottom(20)
-		.margin_start(10)
-		.margin_end(10)
-		.css_classes(vec!["nav-subsection".into()])
-		.build();
+	view! {
+		nav = ListBox::new() {
+			add_css_class: "nav-subsection",
+			set_margin_top: 20,
+			set_margin_bottom: 20,
+			set_margin_start: 10,
+			set_margin_end: 10,
+		}
+	}
 	for (name, groups) in sections {
-		// Set up the subsection in the nav panel
-		let label = Label::builder()
-			.label(name)
-			.margin_top(5)
-			.margin_bottom(5)
-			.margin_start(8)
-			.halign(Align::Start)
-			.build();
-		let row = cascade! {
-			ListBoxSelectionRow::new(name.into());
-			..add_css_class("nav-element");
-			..set_margin_top(8);
-			..set_margin_bottom(8);
-			..set_child(Some(&label));
-		};
+		view! {
+			row = ListBoxSelectionRow::new(name.into()) {
+				add_css_class: "nav-element",
+				set_margin_top: 8,
+				set_margin_bottom: 8,
+				set_child: label = Some(&Label) {
+					set_text: name,
+					set_margin_top: 5,
+					set_margin_bottom: 5,
+					set_margin_end: 8,
+					set_halign: Align::Start
+				}
+			}
+		}
 		nav.append(&row);
 		// Set up the actual groups
-		let panel = gtk4::Box::builder()
-			.orientation(Orientation::Vertical)
-			.spacing(24)
-			.hexpand(true)
-			.build();
-		let scroll_window = ScrolledWindow::builder()
-			.child(&panel)
-			.hscrollbar_policy(PolicyType::Never)
-			.vscrollbar_policy(PolicyType::Automatic)
-			.build();
+		view! {
+			scroll_window = ScrolledWindow {
+				set_hscrollbar_policy: PolicyType::Never,
+				set_vscrollbar_policy: PolicyType::Automatic,
+				set_child: panel = Some(&gtk4::Box) {
+					set_orientation: Orientation::Vertical,
+					set_spacing: 24,
+					set_hexpand: true
+				}
+			}
+		}
 		setup_single(&panel, ui.clone(), groups, sections_store.clone());
 		ui.content.add_named(&scroll_window, Some(name));
 	}
