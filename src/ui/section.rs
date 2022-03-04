@@ -13,28 +13,29 @@ use gtk4::{
 use std::rc::Rc;
 
 pub fn setup<S: Section>(ui: Rc<SettingsGui>, sections_store: SettingsGroupStore) {
-	// Set up the nav entry
-	let icon = Image::from_icon_name(S::ICON);
-	let label = Label::new(Some(S::NAME));
-	let entry_box = gtk4::Box::builder()
-		.orientation(Orientation::Horizontal)
-		.spacing(8)
-		.margin_start(10)
-		.margin_top(10)
-		.margin_end(10)
-		.margin_bottom(10)
-		.build();
-	entry_box.append(&icon);
-	entry_box.append(&label);
-	let row = cascade! {
-		ListBoxSelectionRow::new(S::NAME.into());
-		..add_css_class("nav-element");
-		..set_margin_top(8);
-		..set_margin_bottom(8);
-		..set_margin_start(8);
-		..set_margin_end(8);
-		..set_child(Some(&entry_box));
-	};
+	view! {
+		row = ListBoxSelectionRow::new(S::NAME.into()) {
+			add_css_class: "nav-element",
+			set_margin_top: 8,
+			set_margin_bottom: 8,
+			set_margin_start: 8,
+			set_margin_end: 8,
+			set_child: entry_box = Some(&gtk4::Box) {
+				set_orientation: Orientation::Horizontal,
+				set_spacing: 8,
+				set_margin_start: 10,
+				set_margin_end: 10,
+				set_margin_top: 10,
+				set_margin_bottom: 10,
+				append: icon = &Image {
+					set_icon_name: Some(S::ICON)
+				},
+				append: label = &Label {
+					set_text: S::NAME
+				},
+			}
+		}
+	}
 	ui.nav.list.append(&row);
 	ui.nav.labels.borrow_mut().push(label);
 
@@ -42,16 +43,17 @@ pub fn setup<S: Section>(ui: Rc<SettingsGui>, sections_store: SettingsGroupStore
 	match entries {
 		SectionLayout::Single(groups) => {
 			// Alright, now we setup the actual settings panel
-			let panel = gtk4::Box::builder()
-				.orientation(Orientation::Vertical)
-				.spacing(24)
-				.hexpand(true)
-				.build();
-			let scroll_window = ScrolledWindow::builder()
-				.child(&panel)
-				.hscrollbar_policy(PolicyType::Never)
-				.vscrollbar_policy(PolicyType::Automatic)
-				.build();
+			view! {
+				scroll_window = ScrolledWindow {
+					set_hscrollbar_policy: PolicyType::Never,
+					set_vscrollbar_policy: PolicyType::Automatic,
+					set_child: panel = Some(&gtk4::Box) {
+						set_orientation: Orientation::Vertical,
+						set_spacing: 24,
+						set_hexpand: true
+					}
+				}
+			}
 			setup_single(&panel, ui.clone(), groups, sections_store);
 			ui.content
 				.add_titled(&scroll_window, Some(S::NAME), S::NAME);
