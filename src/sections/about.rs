@@ -218,7 +218,7 @@ impl SettingsGroup for OsInfo {
 				arch_row = LabeledItem {
 					set_title: "OS Type",
 					set_child: arch_label = &Label {
-						set_text: &os_type
+						set_text: os_type
 					}
 				}
 			}

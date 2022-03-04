@@ -154,7 +154,6 @@ impl SettingsGroup for DockSize {
 	}
 
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
-		let check = CheckButton::builder().valign(Align::Center).build();
 		view! {
 			entry_box = gtk4::Box {
 				set_orientation: Orientation::Vertical,
