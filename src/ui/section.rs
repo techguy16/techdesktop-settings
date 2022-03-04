@@ -71,24 +71,23 @@ fn setup_single(
 ) {
 	for group in groups {
 		let title = group.title();
-		let group_box = gtk4::Box::builder()
-			.orientation(Orientation::Vertical)
-			.spacing(8)
-			.build();
-		let group_box_inner = gtk4::Box::builder()
-			.orientation(gtk4::Orientation::Vertical)
-			.spacing(16)
-			.css_classes(vec!["settings-group".into()])
-			.build();
-		if !title.is_empty() {
-			let group_title = Label::builder()
-				.label(title)
-				.css_classes(vec!["settings-group-title".into()])
-				.halign(Align::Start)
-				.build();
-			group_box.append(&group_title);
+		view! {
+			group_box = gtk4::Box {
+				set_orientation: Orientation::Vertical,
+				set_spacing: 8,
+				append: group_box_inner = &gtk4::Box {
+					add_css_class: "settings-group",
+					set_orientation: Orientation::Vertical,
+					set_spacing: 16,
+					append: group_title = &Label {
+						add_css_class: "settings-group-title",
+						set_label: title,
+						set_halign: Align::Start,
+						set_visible: !title.is_empty()
+					}
+				}
+			}
 		}
-		group_box.append(&group_box_inner);
 		group.layout(&group_box_inner, ui.clone());
 		panel.append(&group_box);
 		sections_store.borrow_mut().push(group);
