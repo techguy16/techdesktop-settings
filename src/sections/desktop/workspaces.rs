@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use crate::{sections::SettingsGroup, ui::SettingsGui};
-use gtk4::{prelude::*, Align, CheckButton, SpinButton};
+use gtk4::{prelude::*, Align, CheckButton, Orientation, SpinButton};
 use libcosmic_widgets::{relm4::RelmContainerExt, LabeledItem};
 use std::rc::Rc;
 
@@ -20,6 +20,7 @@ impl SettingsGroup for Workspaces {
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
 		view! {
 			entry_box = gtk4::Box {
+				set_orientation: Orientation::Vertical,
 				container_add: dynamic_workspaces = &LabeledItem {
 					set_title: "Dynamic Workspaces",
 					set_description: "Automatically removes empty workspaces",
@@ -62,6 +63,7 @@ impl SettingsGroup for MultiMonitorBehavior {
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
 		view! {
 			entry_box = gtk4::Box {
+				set_orientation: Orientation::Vertical,
 				container_add: workspaces_span = &LabeledItem {
 					set_title: "Workspaces Span Displays",
 					set_alignment: Align::Start,
@@ -98,6 +100,7 @@ impl SettingsGroup for PlacementWorkspacePicker {
 	fn layout(&self, target: &gtk4::Box, _ui: Rc<SettingsGui>) {
 		view! {
 			entry_box = gtk4::Box {
+				set_orientation: Orientation::Vertical,
 				container_add: left_side = &LabeledItem {
 					set_title: "Along the left side",
 					set_alignment: Align::Start,
